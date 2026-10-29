@@ -1,12 +1,12 @@
 'use client';
 import SectionTitle from '@/components/SectionTitle';
-import { PROJECTS } from '@/lib/data';
+import { useLanguage } from '@/context/LanguageContext';
 import { cn } from '@/lib/utils';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
 import Image from 'next/image';
-import React, { useRef, useState, MouseEvent } from 'react';
+import React, { useRef, useState, MouseEvent, useEffect } from 'react';
 import Project from './Project';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -17,8 +17,9 @@ const ProjectList = () => {
     const imageContainer = useRef<HTMLDivElement>(null);
     const imageRef = useRef<HTMLImageElement>(null);
     const [selectedProject, setSelectedProject] = useState<string | null>(
-        PROJECTS[0].slug,
+        null
     );
+    const { data } = useLanguage();
 
     // update imageRef.current href based on the cursor hover position
     // also update image position
@@ -102,11 +103,35 @@ const ProjectList = () => {
 
         setSelectedProject(slug);
     };
+    
+    // Set first project as selected after data is loaded/available if needed, 
+    // or just rely on the effect. Previously it was: 
+    // useState<string | null>(PROJECTS[0].slug)
+    // Since data.projects comes from context we can do:
+    // useState<string | null>(data && data.projects.length > 0 ? data.projects[0].slug : null);
+    // But hooks cannot be conditional.
+    // Let's set it in an effect or just initialize it with explicit checking, 
+    // however data is guaranteed in context as per my implementation.
+    
+    // Actually, I can just initialize state lazy:
+    // useState(() => data.projects[0].slug) 
+    // But data can change if language changes. If language changes, we might want to keep the selected project 
+    // or reset it. The slug is language independent so it should be fine.
+    // Re-rendering this comp when data changes will not reset state unless I key it or use effect.
+    // I'll stick to a simple useEffect or just let it be null initially.
+    // The original code initialized it to `PROJECTS[0].slug`.
+    
+    useEffect(()=> {
+        if(data.projects.length && !selectedProject) {
+             setSelectedProject(data.projects[0].slug);
+        }
+    }, [data])
+
 
     return (
         <section className="pb-section" id="selected-projects">
             <div className="container">
-                <SectionTitle title="SELECTED PROJECTS" />
+                <SectionTitle title={data.ui.titles.selectedProjects} />
 
                 <div className="group/projects relative" ref={containerRef}>
                     {selectedProject !== null && (
@@ -114,7 +139,7 @@ const ProjectList = () => {
                             className="max-md:hidden absolute right-0 top-0 z-[1] pointer-events-none w-[200px] xl:w-[350px] aspect-[3/4] overflow-hidden opacity-0"
                             ref={imageContainer}
                         >
-                            {PROJECTS.map((project) => (
+                            {data.projects.map((project) => (
                                 <Image
                                     src={project.thumbnail}
                                     alt="Project"
@@ -139,7 +164,7 @@ const ProjectList = () => {
                         className="flex flex-col max-md:gap-10"
                         ref={projectListRef}
                     >
-                        {PROJECTS.map((project, index) => (
+                        {data.projects.map((project, index) => (
                             <Project
                                 index={index}
                                 project={project}

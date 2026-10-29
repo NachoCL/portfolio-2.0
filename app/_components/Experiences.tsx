@@ -1,6 +1,6 @@
 'use client';
 import SectionTitle from '@/components/SectionTitle';
-import { MY_EXPERIENCE } from '@/lib/data';
+import { useLanguage } from '@/context/LanguageContext';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/all';
@@ -10,6 +10,7 @@ gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 const Experiences = () => {
     const containerRef = useRef<HTMLDivElement>(null);
+    const { data } = useLanguage();
 
     useGSAP(
         () => {
@@ -54,10 +55,10 @@ const Experiences = () => {
     return (
         <section className="py-section" id="my-experience">
             <div className="container" ref={containerRef}>
-                <SectionTitle title="My Experience" />
+                <SectionTitle title={data.ui.titles.experience} />
 
-                <div className="grid gap-14">
-                    {MY_EXPERIENCE.map((item) => (
+                <div className="flex flex-col gap-14">
+                    {data.myExperience.map((item) => (
                         <div key={item.title} className="experience-item">
                             <p className="text-xl text-muted-foreground">
                                 {item.company}

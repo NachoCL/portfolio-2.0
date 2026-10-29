@@ -13,6 +13,9 @@ import Preloader from '../components/Preloader';
 import StickyEmail from './_components/StickyEmail';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import Script from 'next/script';
+import { LanguageProvider } from '@/context/LanguageContext';
+import { ThemeProvider } from '@/context/ThemeContext';
+import StyledComponentsRegistry from '@/lib/registry';
 
 const antonFont = Anton({
     weight: '400',
@@ -29,8 +32,8 @@ const robotoFlex = Roboto_Flex({
 });
 
 export const metadata: Metadata = {
-    title: 'Portfolio - Tajmirul Islam',
-    description: 'Personal portfolio of Tajmirul Islam',
+    title: 'Portfolio - Ignacio Cañadilla',
+    description: 'Personal portfolio of Ignacio Cañadilla, Frontend Developer.',
 };
 
 export default function RootLayout({
@@ -54,14 +57,17 @@ export default function RootLayout({
             <body
                 className={`${antonFont.variable} ${robotoFlex.variable} antialiased`}
             >
-                <ReactLenis
-                    root
-                    options={{
-                        lerp: 0.1,
-                        duration: 1.4,
-                    }}
-                >
-                    {/* <a
+                <LanguageProvider>
+                    <ThemeProvider>
+                        <StyledComponentsRegistry>
+                            <ReactLenis
+                            root
+                            options={{
+                                lerp: 0.1,
+                                duration: 1.4,
+                            }}
+                        >
+                            {/* <a
                         href="https://forms.gle/t73XYJgWD5cJNr6e8"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -70,16 +76,19 @@ export default function RootLayout({
                         Frontend dev? I&apos;ll help you polish your resume —
                         completely free.
                     </a> */}
-                    <Navbar />
-                    <main>{children}</main>
-                    <Footer />
+                            <Navbar />
+                            <main>{children}</main>
+                            <Footer />
 
-                    <CustomCursor />
-                    <Preloader />
-                    <ScrollProgressIndicator />
-                    <ParticleBackground />
-                    <StickyEmail />
-                </ReactLenis>
+                            <CustomCursor />
+                            <Preloader />
+                            <ScrollProgressIndicator />
+                            <ParticleBackground />
+                            <StickyEmail />
+                        </ReactLenis>
+                        </StyledComponentsRegistry>
+                    </ThemeProvider>
+                </LanguageProvider>
             </body>
         </html>
     );
